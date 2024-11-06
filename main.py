@@ -5,8 +5,10 @@ import logging
 logging.basicConfig(level=logging.ERROR,
                     format="%(asctime)s - %(levelname)s - %(message)s")
 
+STATE, URL = "Pennsylvania", "https://pastebin.com/raw/YY0nhtQ9"
 
-def fetch_and_project_votes(url):
+
+def fetch_and_project_votes(state_name, url):
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -14,6 +16,7 @@ def fetch_and_project_votes(url):
         soup = BeautifulSoup(html, "html.parser")
         total_trump_votes_projected = 0
         total_harris_votes_projected = 0
+
         county_rows = soup.find_all("div", {"data-testid": "county-row"})
 
         for county in county_rows:
@@ -92,7 +95,18 @@ def fetch_and_project_votes(url):
         harris_projected_percentage = (
             total_harris_votes_projected / total_votes_projected) * 100 if total_votes_projected else 0
 
+        # Calculate estimated error margin based on remaining votes
+        total_percent_in = sum(float(county.find("span", class_="percent-in").text.strip("% in")) / 100
+                               for county in county_rows if county.find("span", class_="percent-in"))
+        average_percent_in = total_percent_in / \
+            len(county_rows) if county_rows else 1
+        error_margin = (1 - average_percent_in) * 100
+
         winner = "Trump" if total_trump_votes_projected > total_harris_votes_projected else "Harris"
+
+        print(f"State: {state_name}")
+        print(f"Max Est. Error Margin: ±{error_margin:.2f}%")
+        print()
         print(f"Projected Winner: {winner}")
         print(
             f"Total Projected Trump Votes: {int(total_trump_votes_projected)} ({trump_projected_percentage:.2f}%)")
@@ -103,5 +117,4 @@ def fetch_and_project_votes(url):
         logging.error(f"Error fetching and parsing data: {e}")
 
 
-url = "https://pastebin.com/raw/ukBuqaYw"
-fetch_and_project_votes(url)
+fetch_and_project_votes(STATE, URL)
