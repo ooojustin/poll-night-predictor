@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.ERROR,
 # 2.) Locate the HTML node that contains all county data by using this DOM query: 'div#president-results-table'
 # 3.) Copy the entire outer HTML of this element and make the raw content accessible via a remote URL (e.g., using Pastebin).
 # 4.) Replace the following state name/URL (or modify the script to support multiple states - this was written last minute) and execute the script.
-STATE, URL = "Pennsylvania", "https://pastebin.com/raw/YY0nhtQ9"
+STATE, URL = "Pennsylvania", "https://pastebin.com/raw/7c1PaSUa"
 
 
 def fetch_and_project_votes(state_name, url):
